@@ -1,0 +1,16 @@
+{
+  "name": "THOMPRESSOR™ • Vintage FET Limiter",
+  "short_name": "Thompressor",
+  "description": "Vintage FET Limiter by Tomi 'Thom Force' Forsblom. Retro analog compressor PWA.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0a0807",
+  "theme_color": "#0a0807",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' fill='%230a0807'/%3E%3Ctext x='96' y='118' font-family='monospace' font-size='72' font-weight='900' text-anchor='middle' fill='%23ff6b00'%3ET%3C/text%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ]
+}
