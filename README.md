@@ -1,4 +1,4 @@
-# THOMPRESSOR™ v1.0
+# THOMPRESSOR™ v1.1
 
 **Vintage FET Limiter • Handcrafted in Helsinki**
 
@@ -13,6 +13,14 @@ Retro analog compressor PWA by Tomi "Thom Force" Forsblom.
 - Built-in VHS-style recorder (REC / PLAY / SAVE / DEL)
 - Fully offline PWA (installable to home screen)
 - 60 fps smooth animations
+
+## Changelog
+
+- **v1.1** (28.4.2026)  
+  Audio engine rewrite + textured visual redesign  
+  (uusi index.html + manifest.json + THOMPRESSOR-AGENTS.md)
+
+- **v1.0** (alkuperäinen julkaisu)
 
 ## How to use
 1. Open in any modern browser (best on iOS Safari or Chrome)
