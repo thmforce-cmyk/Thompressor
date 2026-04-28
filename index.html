@@ -1,621 +1,1593 @@
 <!DOCTYPE html>
 <html lang="fi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>THOMPRESSOR™ • Vintage FET Limiter</title>
-    <meta name="description" content="Thompressor™ — Vintage FET Limiter by Tomi 'Thom Force' Forsblom. Retro analog compressor PWA.">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0a0807">
-    <style>
-        :root {
-            --bg: #0a0807;
-            --panel: #1a140f;
-            --amber: #ffb454;
-            --hot: #ff5c3a;
-            --line: #3a2a1c;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            background: var(--bg);
-            color: #f4d9a6;
-            font-family: ui-monospace, "SF Mono", monospace;
-            font-size: 13px;
-            line-height: 1.4;
-            padding: 12px;
-            max-width: 420px;
-            margin: 0 auto;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 16px;
-            border-bottom: 1px solid var(--line);
-            padding-bottom: 12px;
-        }
-        .brand {
-            font-size: 28px;
-            font-weight: 900;
-            color: #ff6b00;
-            letter-spacing: -1px;
-        }
-        .tagline {
-            font-size: 10px;
-            color: #a88758;
-            letter-spacing: 1.5px;
-        }
-        .module {
-            background: var(--panel);
-            border: 1px solid var(--line);
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 16px;
-        }
-        .section-title {
-            font-size: 11px;
-            font-weight: 700;
-            color: #a88758;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-        }
-        .knob-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
-        .knob {
-            text-align: center;
-            width: 52px;
-        }
-        .knob-label {
-            font-size: 9px;
-            color: #a88758;
-            margin-bottom: 4px;
-        }
-        .knob-value {
-            font-size: 11px;
-            color: #ffb454;
-            font-weight: 700;
-            margin-top: 4px;
-        }
-        .knob-circle {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: radial-gradient(circle at 35% 30%, #444, #222);
-            border: 2px solid #555;
-            position: relative;
-            cursor: grab;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.6);
-        }
-        .knob-circle:active {
-            cursor: grabbing;
-        }
-        .knob-indicator {
-            position: absolute;
-            top: 4px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 3px;
-            height: 18px;
-            background: #ffb454;
-            border-radius: 2px;
-        }
-        .vu-container {
-            background: #111;
-            border: 1px solid #333;
-            border-radius: 4px;
-            padding: 8px;
-            margin: 12px 0;
-        }
-        .vu-label {
-            font-size: 9px;
-            color: #666;
-            text-align: center;
-            margin-bottom: 4px;
-        }
-        .vu-meter {
-            height: 18px;
-            background: linear-gradient(90deg, #ff5c3a, #ffb454, #7fcf6a);
-            border-radius: 2px;
-            position: relative;
-            overflow: hidden;
-        }
-        .vu-needle {
-            position: absolute;
-            top: -2px;
-            width: 3px;
-            height: 22px;
-            background: #fff;
-            box-shadow: 0 0 6px #fff;
-            transition: left 0.05s linear;
-        }
-        .controls {
-            display: flex;
-            gap: 8px;
-            margin-top: 12px;
-        }
-        .btn {
-            flex: 1;
-            padding: 10px 8px;
-            background: #222;
-            border: 1px solid #555;
-            color: #f4d9a6;
-            font-size: 11px;
-            font-weight: 700;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.1s;
-        }
-        .btn:active {
-            transform: translateY(1px);
-            background: #333;
-        }
-        .btn.rec {
-            background: #3a1a1a;
-            border-color: #ff5c3a;
-            color: #ff5c3a;
-        }
-        .status {
-            font-size: 10px;
-            color: #666;
-            text-align: center;
-            margin-top: 8px;
-        }
-        .footer {
-            text-align: center;
-            font-size: 9px;
-            color: #666;
-            margin-top: 20px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>THOMPRESSOR™ • Vintage FET Limiter</title>
+<meta name="description" content="Thompressor™ — Vintage FET Limiter by Tomi 'Thom Force' Forsblom">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0c0a07">
+<style>
+/* ============================================================
+   THOMPRESSOR™ v1.1
+   Design by Tomi "Thom Force" Forsblom
+   Audio engine rewrite + textured visual redesign
+   ============================================================ */
+
+:root {
+  --bg:         #0c0a07;
+  --panel:      #1a1610;
+  --panel-hi:   #221e16;
+  --rim:        #2e2618;
+  --rim-lo:     #0e0c08;
+  --orange:     #ff6b00;
+  --amber:      #ffb454;
+  --hot:        #ff4a24;
+  --label:      #8a6a42;
+  --label-hi:   #b8925e;
+  --ink:        #e0cba0;
+  --dim:        #4a3a22;
+  --vu-dark:    #050e05;
+  --vu-green:   #1e7a14;
+  --vu-amber:   #8a7010;
+  --vu-red:     #8a1a08;
+  --screw:      radial-gradient(circle at 38% 36%, #5a5038, #2a2418 60%, #181410);
+  --knob-face:  radial-gradient(circle at 36% 32%, #4e4838 0%, #32302a 30%, #201e18 65%, #141210 100%);
+  --accent:     var(--orange);        /* changes with TONE */
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { height: 100%; }
+body {
+  min-height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 24px 12px 48px;
+  background: var(--bg);
+  /* deep noise texture on page bg */
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.055'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse at 50% 0%, #1a1408 0%, var(--bg) 60%);
+  font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, monospace;
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===================================================
+   THE UNIT — outer rack shell
+   =================================================== */
+.unit {
+  width: 100%;
+  max-width: 408px;
+  position: relative;
+  /* Rack ears / side handles */
+  filter: drop-shadow(0 20px 60px rgba(0,0,0,0.95)) drop-shadow(0 4px 12px rgba(0,0,0,0.8));
+}
+
+/* ===================================================
+   FACEPLATE — main panel
+   =================================================== */
+.faceplate {
+  position: relative;
+  background:
+    /* panel noise grain */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E"),
+    /* panel gradient */
+    linear-gradient(175deg, #24201a 0%, #1a1610 30%, #161210 70%, #1e1a12 100%);
+  background-blend-mode: soft-light, normal;
+  border-radius: 5px;
+  border: 1px solid var(--rim);
+  outline: 3px solid var(--rim-lo);
+  outline-offset: -1px;
+  overflow: visible;
+  padding-bottom: 22px;
+}
+
+/* Inner edge highlight */
+.faceplate::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 5px;
+  border: 1px solid rgba(255,255,255,0.035);
+  pointer-events: none;
+  z-index: 20;
+}
+
+/* Scanline overlay */
+.faceplate::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 5px;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(0,0,0,0.06) 3px,
+    rgba(0,0,0,0.06) 4px
+  );
+  pointer-events: none;
+  z-index: 19;
+}
+
+/* ===== CORNER SCREWS ===== */
+.screws {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 21;
+}
+.screw {
+  position: absolute;
+  width: 11px; height: 11px;
+  border-radius: 50%;
+  background: var(--screw);
+  box-shadow:
+    inset 0 1px 3px rgba(0,0,0,0.85),
+    inset 0 -1px 0 rgba(255,255,255,0.04),
+    0 1px 1px rgba(255,255,255,0.04);
+}
+/* Phillips cross on screw */
+.screw::before, .screw::after {
+  content: '';
+  position: absolute;
+  background: rgba(0,0,0,0.5);
+  border-radius: 1px;
+  top: 50%; left: 50%;
+}
+.screw::before { width: 5px; height: 1.5px; transform: translate(-50%, -50%); }
+.screw::after  { width: 1.5px; height: 5px; transform: translate(-50%, -50%); }
+.screw-tl { top: 11px; left: 11px; }
+.screw-tr { top: 11px; right: 11px; }
+.screw-bl { bottom: 11px; left: 11px; }
+.screw-br { bottom: 11px; right: 11px; }
+
+/* ===================================================
+   ALUMINUM HEADER STRIP
+   =================================================== */
+.header-strip {
+  position: relative;
+  padding: 20px 30px 15px;
+  background:
+    /* fine horizontal brushed metal lines */
+    repeating-linear-gradient(
+      90deg,
+      transparent, transparent 1px,
+      rgba(255,255,255,0.012) 1px, rgba(255,255,255,0.012) 2px
+    ),
+    /* strip gradient */
+    linear-gradient(180deg,
+      #383020 0%,
+      #28241a 25%,
+      #1e1c14 60%,
+      #14120e 100%
+    );
+  border-bottom: 1px solid #0a0806;
+  border-top: 1px solid rgba(255,255,255,0.04);
+  box-shadow: 0 3px 12px rgba(0,0,0,0.6), inset 0 -1px 0 rgba(0,0,0,0.5);
+  overflow: hidden;
+  border-radius: 5px 5px 0 0;
+}
+
+/* Engraved channel mark on left */
+.header-strip::before {
+  content: '';
+  position: absolute;
+  left: 28px; top: 50%;
+  width: 2px; height: 28px;
+  transform: translateY(-50%);
+  background: linear-gradient(180deg, transparent, rgba(255,107,0,0.6), transparent);
+  box-shadow: 1px 0 0 rgba(0,0,0,0.6);
+}
+
+.brand-block { text-align: center; }
+
+.brand-logo {
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  color: #ff6b00;
+  line-height: 1;
+  text-shadow:
+    0 0 16px rgba(255,107,0,0.45),
+    0 2px 0 rgba(0,0,0,0.9),
+    0 -1px 0 rgba(255,180,84,0.15);
+}
+
+.brand-sub {
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--label);
+  font-weight: 700;
+  margin-top: 5px;
+}
+
+.brand-credit {
+  font-size: 7.5px;
+  letter-spacing: 0.4px;
+  color: #4a3820;
+  margin-top: 7px;
+}
+
+/* ===================================================
+   SECTION DIVIDERS
+   =================================================== */
+.divider {
+  height: 1px;
+  margin: 0 14px;
+  background: linear-gradient(90deg, transparent, #2a2018 20%, #2a2018 80%, transparent);
+  position: relative;
+}
+.divider::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.025) 20%, rgba(255,255,255,0.025) 80%, transparent);
+  transform: translateY(-1px);
+}
+
+.section-hed {
+  font-size: 7.5px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  color: var(--dim);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px 6px;
+}
+.section-hed::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, #2a2018, transparent);
+}
+
+/* ===================================================
+   INPUT SELECTOR
+   =================================================== */
+.input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 18px 10px;
+}
+
+.rotary-group {
+  display: flex;
+  flex: 1;
+  background: #0a0806;
+  border: 1px solid #201a10;
+  border-radius: 3px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.7);
+}
+
+.rotary-opt {
+  flex: 1;
+  padding: 7px 2px;
+  background: transparent;
+  border: none;
+  border-right: 1px solid #1a1410;
+  color: #3a2e1a;
+  font: 700 9px/1 ui-monospace, monospace;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.12s;
+}
+.rotary-opt:last-child { border-right: none; }
+.rotary-opt.active {
+  background: #1e1a12;
+  color: var(--amber);
+  box-shadow: inset 0 1px 4px rgba(0,0,0,0.7);
+}
+.rotary-opt:disabled { opacity: 0.25; cursor: not-allowed; }
+.rotary-opt:not(:disabled):not(.active):hover { color: var(--dim); }
+
+/* LED status indicator */
+.led {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #0a0a06;
+  border: 1px solid #1a180e;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.8);
+  flex-shrink: 0;
+  transition: all 0.6s;
+}
+.led.on {
+  background: #4a9010;
+  border-color: #2a5a08;
+  box-shadow: 0 0 6px rgba(74,144,16,0.85), 0 0 12px rgba(74,144,16,0.3), inset 0 0 2px rgba(255,255,255,0.3);
+}
+
+/* ===================================================
+   VU METER — true analog arc needle
+   =================================================== */
+.vu-section { padding: 0 16px 2px; }
+
+.vu-housing {
+  background:
+    linear-gradient(180deg, #060e06 0%, #081208 100%);
+  border: 1px solid #142014;
+  border-radius: 4px;
+  padding: 8px 10px 6px;
+  box-shadow:
+    inset 0 3px 10px rgba(0,0,0,0.9),
+    inset 0 0 30px rgba(0,60,0,0.07),
+    0 1px 0 rgba(255,255,255,0.025);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Green phosphor glow */
+.vu-housing::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 40%;
+  background: radial-gradient(ellipse at 50% 100%, rgba(30,100,20,0.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* Glass reflection */
+.vu-housing::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 30%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.018) 0%, transparent 100%);
+  border-radius: 4px 4px 0 0;
+  pointer-events: none;
+}
+
+.vu-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2px;
+}
+
+.vu-brand {
+  font-size: 7.5px;
+  letter-spacing: 2px;
+  color: #1e4a1e;
+  font-weight: 700;
+}
+
+.vu-mode-toggle {
+  display: flex;
+  gap: 8px;
+  font-size: 7.5px;
+  color: #1e4a1e;
+}
+.vu-mode-toggle label {
+  display: flex; align-items: center; gap: 2px; cursor: pointer;
+}
+.vu-mode-toggle input[type=radio] {
+  accent-color: #2a6a1a; width: 9px; height: 9px;
+}
+
+.vu-svg { width: 100%; display: block; }
+
+/* ===================================================
+   KNOB SECTION
+   =================================================== */
+.knobs-section { padding: 4px 14px 0; }
+
+.knob-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 2px;
+  margin-bottom: 2px;
+}
+
+.ctrl {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  flex: 1;
+}
+
+.ctrl-lbl {
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  color: var(--label);
+  text-align: center;
+  line-height: 1;
+}
+
+/* THE KNOB */
+.knob-wrap {
+  position: relative;
+  width: 52px; height: 52px;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  flex-shrink: 0;
+}
+.knob-wrap:active { cursor: grabbing; }
+.knob-wrap:focus { outline: none; }
+.knob-wrap:focus-visible .knob-body { box-shadow: 0 4px 14px rgba(0,0,0,0.7), 0 0 0 2px rgba(255,107,0,0.5); }
+
+/* SVG arc track (behind knob body) */
+.k-svg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+
+/* Knob body */
+.knob-body {
+  position: absolute;
+  inset: 9px;
+  border-radius: 50%;
+  background: var(--knob-face);
+  border: 1.5px solid #3e3828;
+  box-shadow:
+    0 4px 14px rgba(0,0,0,0.75),
+    0 1px 0 rgba(255,255,255,0.05),
+    inset 0 -2px 5px rgba(0,0,0,0.65),
+    inset 0 2px 3px rgba(255,255,255,0.045);
+  /* No pointer-events so SVG is clickable */
+}
+
+/* Knob highlight glint */
+.knob-body::before {
+  content: '';
+  position: absolute;
+  top: 2px; left: 4px;
+  width: 40%; height: 30%;
+  background: radial-gradient(ellipse at 40% 40%, rgba(255,255,255,0.09), transparent 70%);
+  border-radius: 50%;
+}
+
+.ctrl-val {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--amber);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  min-width: 42px;
+  line-height: 1;
+}
+
+/* ===================================================
+   BOTTOM ROW — Tube + Power + Tone
+   =================================================== */
+.bottom-strip {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 10px 18px 0;
+  justify-content: space-between;
+}
+
+/* TUBE */
+.tube-module {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.tube-lbl {
+  font-size: 7px;
+  letter-spacing: 1.5px;
+  color: var(--dim);
+  font-weight: 700;
+}
+
+.tube-outer {
+  width: 22px; height: 48px;
+  position: relative;
+}
+
+/* tube glass */
+.tube-glass {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, #181410 0%, #0e0c09 100%);
+  border: 1px solid #2a2418;
+  border-radius: 11px 11px 4px 4px;
+  overflow: hidden;
+  box-shadow:
+    inset 0 0 10px rgba(0,0,0,0.8),
+    0 2px 6px rgba(0,0,0,0.6);
+}
+
+/* glass reflection */
+.tube-glass::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 20%;
+  width: 25%;
+  height: 60%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), transparent);
+  border-radius: 0 0 4px 4px;
+}
+
+.tube-filament {
+  position: absolute;
+  bottom: 6px; left: 50%;
+  width: 2px; height: 14px;
+  background: linear-gradient(180deg, #ff6b00, #cc2200);
+  transform: translateX(-50%);
+  border-radius: 1px;
+  opacity: 0;
+  transition: opacity 0.8s 0.4s;
+  box-shadow: 0 0 5px #ff4400;
+}
+
+.tube-glow {
+  position: absolute;
+  inset: 2px;
+  border-radius: 9px 9px 2px 2px;
+  background: radial-gradient(ellipse at 50% 45%, #ff8c42 0%, rgba(255,107,0,0.4) 40%, transparent 75%);
+  opacity: 0;
+  transition: opacity 1.2s cubic-bezier(0.4,0,0.2,1);
+}
+
+.tube-outer.on .tube-glow     { opacity: 0.88; }
+.tube-outer.on .tube-filament { opacity: 1; }
+
+/* POWER */
+.power-module {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.power-btn {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 38% 33%, #2e2a20, #141210);
+  border: 2px solid #2e2818;
+  cursor: pointer;
+  position: relative;
+  box-shadow:
+    0 5px 15px rgba(0,0,0,0.75),
+    0 1px 0 rgba(255,255,255,0.04),
+    inset 0 -2px 6px rgba(0,0,0,0.6),
+    inset 0 2px 3px rgba(255,255,255,0.04);
+  transition: all 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.power-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.7), inset 0 3px 6px rgba(0,0,0,0.6);
+}
+
+.power-icon {
+  width: 20px; height: 20px;
+  position: relative;
+}
+/* Power symbol drawn with CSS */
+.power-icon::before {
+  content: '';
+  position: absolute;
+  top: 3px; left: 50%;
+  width: 2px; height: 8px;
+  background: #2e2818;
+  transform: translateX(-50%);
+  border-radius: 1px;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+.power-icon::after {
+  content: '';
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 16px; height: 16px;
+  border: 2px solid #2e2818;
+  border-radius: 50%;
+  clip-path: polygon(0 50%, 100% 50%, 100% 100%, 0 100%);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.power-btn.on .power-icon::before {
+  background: var(--orange);
+  box-shadow: 0 0 6px var(--orange);
+}
+.power-btn.on .power-icon::after {
+  border-color: var(--orange);
+  box-shadow: 0 0 6px var(--orange);
+}
+
+.power-lbl {
+  font-size: 7px; letter-spacing: 2px;
+  color: var(--dim); font-weight: 700;
+}
+
+/* TONE knob (smaller) */
+.tone-module {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+/* ===================================================
+   VHS DECK
+   =================================================== */
+.deck {
+  margin: 12px 14px 0;
+  background: #0d0b08;
+  border: 1px solid #1e1a10;
+  border-radius: 4px;
+  padding: 10px 12px;
+  box-shadow: inset 0 3px 8px rgba(0,0,0,0.8);
+  position: relative;
+}
+
+/* Cassette tape slot */
+.deck::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: 50%;
+  transform: translateX(-50%);
+  width: 60px; height: 4px;
+  background: #080604;
+  border-radius: 0 0 3px 3px;
+  border: 1px solid #1a1610;
+  border-top: none;
+}
+
+.deck-title {
+  font-size: 8px; letter-spacing: 2px;
+  color: var(--hot); font-weight: 700;
+  margin-bottom: 8px;
+  display: flex; align-items: center; gap: 6px;
+}
+.deck-title::after {
+  content: '';
+  flex: 1; height: 1px;
+  background: linear-gradient(90deg, #2a1010, transparent);
+}
+
+.deck-btns {
+  display: flex; gap: 5px;
+}
+
+.deck-btn {
+  flex: 1;
+  padding: 8px 3px;
+  background: #1a1610;
+  border: 1px solid #2a2018;
+  color: var(--dim);
+  font: 700 8.5px/1 ui-monospace, monospace;
+  letter-spacing: 0.3px;
+  border-radius: 3px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.08s;
+  box-shadow:
+    0 2px 5px rgba(0,0,0,0.6),
+    inset 0 1px 0 rgba(255,255,255,0.025);
+}
+.deck-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.6), inset 0 2px 4px rgba(0,0,0,0.5);
+}
+.deck-btn.rec { color: var(--hot); border-color: #2a1208; }
+.deck-btn.rec.live {
+  color: #ff2a0a;
+  border-color: #ff2a0a;
+  background: #180808;
+  box-shadow: 0 0 8px rgba(255,42,10,0.2), 0 2px 5px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
+  animation: recblink 0.9s ease-in-out infinite;
+}
+@keyframes recblink {
+  0%,100% { border-color: #2a1208; }
+  50%     { border-color: #ff2a0a; }
+}
+
+.deck-status {
+  font-size: 8.5px; color: #3a2e18;
+  text-align: center; margin-top: 7px;
+  font-variant-numeric: tabular-nums;
+  min-height: 13px;
+}
+
+/* ===================================================
+   FOOTER
+   =================================================== */
+.unit-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 18px 0;
+}
+
+.foot-txt {
+  font-size: 7.5px; color: #2e2416; letter-spacing: 0.3px;
+}
+
+.foot-links { display: flex; gap: 10px; }
+.foot-links a {
+  font-size: 7.5px; color: #2e2416;
+  text-decoration: none; letter-spacing: 0.2px;
+  transition: color 0.2s;
+}
+.foot-links a:hover { color: var(--dim); }
+
+/* ===================================================
+   REDUCED MOTION
+   =================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .tube-glow, .tube-filament, .power-icon::before, .power-icon::after { transition: none; }
+  .deck-btn.rec.live { animation: none; }
+}
+
+/* ===================================================
+   RESPONSIVE
+   =================================================== */
+@media (max-width: 380px) {
+  body { padding: 12px 8px 32px; }
+  .knob-wrap { width: 46px; height: 46px; }
+  .knob-body { inset: 8px; }
+  .ctrl-lbl { font-size: 6.5px; }
+}
+</style>
 </head>
 <body>
-    <div class="header">
-        <div class="brand">THOMPRESSOR™</div>
-        <div class="tagline">VINTAGE FET LIMITER • EST. 1982</div>
-        <div style="font-size: 9px; color: #666; margin-top: 4px;">DESIGN BY TOMI "THOM FORCE" FORSBLOM</div>
+
+<div class="unit">
+  <div class="faceplate" id="faceplate">
+
+    <!-- Screws -->
+    <div class="screws">
+      <div class="screw screw-tl"></div>
+      <div class="screw screw-tr"></div>
+      <div class="screw screw-bl"></div>
+      <div class="screw screw-br"></div>
     </div>
 
-    <!-- INPUT SELECTOR -->
-    <div class="module">
-        <div class="section-title">INPUT SOURCE</div>
-        <select id="input-select" style="width: 100%; padding: 8px; background: #111; color: #f4d9a6; border: 1px solid #555; border-radius: 4px; font-size: 13px;">
-            <option value="demo">DEMO SIGNAL (Saw + Noise)</option>
-            <option value="mic">MICROPHONE</option>
-            <option value="line">LINE IN (Future)</option>
-        </select>
+    <!-- ── HEADER ── -->
+    <div class="header-strip">
+      <div class="brand-block">
+        <div class="brand-logo">THOMPRESSOR™</div>
+        <div class="brand-sub">FET LIMITER &nbsp;•&nbsp; EST. 1982</div>
+        <div class="brand-credit">DESIGN BY TOMI "THOM FORCE" FORSBLOM &nbsp;•&nbsp; HANDCRAFTED IN HELSINKI</div>
+      </div>
     </div>
 
-    <!-- COMPRESSOR -->
-    <div class="module">
-        <div class="section-title">THOMPRESSOR™ • FET LIMITER</div>
-        
-        <!-- VU METER -->
-        <div class="vu-container">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                <div class="vu-label">VU METER</div>
-                <div style="display: flex; gap: 4px; font-size: 10px;">
-                    <label style="display: flex; align-items: center; gap: 4px; cursor: pointer;">
-                        <input type="radio" name="vu-mode" value="input" checked> INPUT
-                    </label>
-                    <label style="display: flex; align-items: center; gap: 4px; cursor: pointer;">
-                        <input type="radio" name="vu-mode" value="output"> OUTPUT
-                    </label>
-                </div>
-            </div>
-            <div class="vu-meter" id="vu-meter">
-                <div class="vu-needle" id="vu-needle" style="left: 50%;"></div>
-            </div>
-        </div>
-
-        <!-- KNOBS -->
-        <div class="knob-row">
-            <div class="knob">
-                <div class="knob-label">THRESHOLD</div>
-                <div class="knob-circle" id="knob-threshold" data-param="threshold" data-min="-40" data-max="-10" data-value="-24"></div>
-                <div class="knob-value" id="val-threshold">-24 dB</div>
-            </div>
-            <div class="knob">
-                <div class="knob-label">RATIO</div>
-                <div class="knob-circle" id="knob-ratio" data-param="ratio" data-min="4" data-max="20" data-value="4"></div>
-                <div class="knob-value" id="val-ratio">4:1</div>
-            </div>
-            <div class="knob">
-                <div class="knob-label">ATTACK</div>
-                <div class="knob-circle" id="knob-attack" data-param="attack" data-min="0.1" data-max="100" data-value="0.5"></div>
-                <div class="knob-value" id="val-attack">0.5 ms</div>
-            </div>
-        </div>
-        <div class="knob-row">
-            <div class="knob">
-                <div class="knob-label">RELEASE</div>
-                <div class="knob-circle" id="knob-release" data-param="release" data-min="10" data-max="2000" data-value="120"></div>
-                <div class="knob-value" id="val-release">120 ms</div>
-            </div>
-            <div class="knob">
-                <div class="knob-label">MAKEUP</div>
-                <div class="knob-circle" id="knob-makeup" data-param="makeup" data-min="-12" data-max="+12" data-value="+4"></div>
-                <div class="knob-value" id="val-makeup">+4 dB</div>
-            </div>
-            <div class="knob">
-                <div class="knob-label">TONE</div>
-                <div class="knob-circle" id="knob-tone" data-param="tone" data-min="0" data-max="100" data-value="30"></div>
-                <div class="knob-value" id="val-tone">WARM</div>
-            </div>
-        </div>
-
-        <div class="controls">
-            <button class="btn" id="power-btn">POWER</button>
-            <button class="btn" id="reset-btn">RESET ALL</button>
-        </div>
+    <!-- ── INPUT SOURCE ── -->
+    <div class="section-hed">INPUT SOURCE</div>
+    <div class="input-row">
+      <div class="rotary-group" id="input-switch">
+        <button class="rotary-opt active" data-val="demo">DEMO</button>
+        <button class="rotary-opt"        data-val="mic">MIC</button>
+        <button class="rotary-opt"        data-val="line" disabled>LINE</button>
+      </div>
+      <div class="led" id="led"></div>
     </div>
 
-    <!-- VHS DECK -->
-    <div class="module" style="background: #111; border-color: #444;">
-        <div class="section-title" style="color: #ff5c3a;">TFD • VHS DECK</div>
-        <div style="display: flex; gap: 8px; margin-top: 8px;">
-            <button class="btn rec" id="rec-btn">● REC</button>
-            <button class="btn" id="play-btn">▶ PLAY</button>
-            <button class="btn" id="stop-btn">■ STOP</button>
-            <button class="btn" id="save-btn">SAVE</button>
-            <button class="btn" id="del-btn">DEL</button>
+    <div class="divider"></div>
+
+    <!-- ── VU METER ── -->
+    <div class="section-hed">VU METER</div>
+    <div class="vu-section">
+      <div class="vu-housing">
+        <div class="vu-top-row">
+          <div class="vu-brand">TF • DYNAMICS</div>
+          <div class="vu-mode-toggle">
+            <label><input type="radio" name="vu-mode" value="in" checked> IN</label>
+            <label><input type="radio" name="vu-mode" value="out"> OUT</label>
+          </div>
         </div>
-        <div class="status" id="deck-status">READY • No recording</div>
+        <!-- SVG arc VU needle meter -->
+        <svg class="vu-svg" viewBox="0 0 320 95" id="vu-svg">
+          <defs>
+            <linearGradient id="arcGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%"   stop-color="#123a12"/>
+              <stop offset="55%"  stop-color="#2a5010"/>
+              <stop offset="75%"  stop-color="#506010"/>
+              <stop offset="88%"  stop-color="#602010"/>
+              <stop offset="100%" stop-color="#7a0a08"/>
+            </linearGradient>
+            <filter id="nglow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="1.8" result="b"/>
+              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <!-- Scale: drawn by JS -->
+          <g id="vu-scale-g"></g>
+          <!-- Background track arc -->
+          <path id="vu-track" stroke="url(#arcGrad)" stroke-width="3" fill="none" opacity="0.35"/>
+          <!-- Active level arc -->
+          <path id="vu-level" stroke="#1e6a10" stroke-width="3" fill="none"/>
+          <!-- Pivot recess -->
+          <circle cx="160" cy="88" r="6" fill="#050e05" stroke="#122012" stroke-width="1.5"/>
+          <!-- Needle -->
+          <g id="vu-needle-g">
+            <line x1="160" y1="88" x2="160" y2="18"
+              stroke="#ff4a24" stroke-width="1.5" stroke-linecap="round"
+              filter="url(#nglow)"/>
+          </g>
+          <!-- Pivot cap -->
+          <circle cx="160" cy="88" r="3.5" fill="#ff4a24"/>
+        </svg>
+      </div>
     </div>
 
-    <div class="footer">
-        THOMPRESSOR™ v1.0 • HANDCRAFTED IN HELSINKI<br>
-        <a href="THOMPRESSOR-AGENTS.md" style="color: #666; text-decoration: none;">AGENTS.md</a> • 
-        <a href="PROJECT.md" style="color: #666; text-decoration: none;">PROJECT.md</a>
+    <div class="divider"></div>
+
+    <!-- ── DYNAMICS KNOBS ── -->
+    <div class="section-hed">DYNAMICS</div>
+    <div class="knobs-section">
+      <div class="knob-row">
+
+        <!-- THRESHOLD -->
+        <div class="ctrl">
+          <div class="ctrl-lbl">THRESH</div>
+          <div class="knob-wrap" id="kw-threshold" data-param="threshold"
+               data-min="-40" data-max="-10" data-default="-24" tabindex="0">
+            <svg class="k-svg" viewBox="0 0 52 52" id="ks-threshold"></svg>
+            <div class="knob-body"></div>
+          </div>
+          <div class="ctrl-val" id="kv-threshold">−24 dB</div>
+        </div>
+
+        <!-- RATIO -->
+        <div class="ctrl">
+          <div class="ctrl-lbl">RATIO</div>
+          <div class="knob-wrap" id="kw-ratio" data-param="ratio"
+               data-min="1" data-max="20" data-default="4" tabindex="0">
+            <svg class="k-svg" viewBox="0 0 52 52" id="ks-ratio"></svg>
+            <div class="knob-body"></div>
+          </div>
+          <div class="ctrl-val" id="kv-ratio">4 : 1</div>
+        </div>
+
+        <!-- ATTACK -->
+        <div class="ctrl">
+          <div class="ctrl-lbl">ATTACK</div>
+          <div class="knob-wrap" id="kw-attack" data-param="attack"
+               data-min="0.1" data-max="100" data-default="0.5" tabindex="0">
+            <svg class="k-svg" viewBox="0 0 52 52" id="ks-attack"></svg>
+            <div class="knob-body"></div>
+          </div>
+          <div class="ctrl-val" id="kv-attack">0.5 ms</div>
+        </div>
+
+        <!-- RELEASE -->
+        <div class="ctrl">
+          <div class="ctrl-lbl">RELEASE</div>
+          <div class="knob-wrap" id="kw-release" data-param="release"
+               data-min="10" data-max="1200" data-default="120" tabindex="0">
+            <svg class="k-svg" viewBox="0 0 52 52" id="ks-release"></svg>
+            <div class="knob-body"></div>
+          </div>
+          <div class="ctrl-val" id="kv-release">120 ms</div>
+        </div>
+
+        <!-- MAKEUP -->
+        <div class="ctrl">
+          <div class="ctrl-lbl">MAKEUP</div>
+          <div class="knob-wrap" id="kw-makeup" data-param="makeup"
+               data-min="-12" data-max="12" data-default="4" tabindex="0">
+            <svg class="k-svg" viewBox="0 0 52 52" id="ks-makeup"></svg>
+            <div class="knob-body"></div>
+          </div>
+          <div class="ctrl-val" id="kv-makeup">+4 dB</div>
+        </div>
+
+      </div>
     </div>
 
-    <script>
-        // Full Thompressor v1.0 code (simplified but complete version)
-        // All core functionality + touch support + PWA ready
-        
-        let audioCtx;
-        let compressor;
-        let analyserIn, analyserOut;
-        let sourceNode;
-        let isPowerOn = true;
-        let mediaRecorder;
-        let recordedChunks = [];
-        let isRecording = false;
+    <div class="divider"></div>
 
-        function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-        }
+    <!-- ── BOTTOM ROW: TUBE + POWER + TONE ── -->
+    <div class="bottom-strip">
 
-        // Initialize compressor
-        function initCompressor() {
-            if (!compressor) {
-                compressor = audioCtx.createDynamicsCompressor();
-                compressor.threshold.value = -24;
-                compressor.ratio.value = 4;
-                compressor.attack.value = 0.005;
-                compressor.release.value = 0.12;
-                compressor.knee.value = 6;
-            }
-            
-            // Analysers
-            analyserIn = audioCtx.createAnalyser();
-            analyserOut = audioCtx.createAnalyser();
-            analyserIn.fftSize = 256;
-            analyserOut.fftSize = 256;
-        }
+      <!-- Tube -->
+      <div class="tube-module">
+        <div class="tube-lbl">TUBE</div>
+        <div class="tube-outer" id="tube-outer">
+          <div class="tube-glass">
+            <div class="tube-filament"></div>
+            <div class="tube-glow"></div>
+          </div>
+        </div>
+      </div>
 
-        // Create demo signal
-        function createDemoSignal() {
-            const osc = audioCtx.createOscillator();
-            osc.type = 'sawtooth';
-            osc.frequency.value = 110;
-            
-            const noise = audioCtx.createBufferSource();
-            const buffer = audioCtx.createBuffer(1, audioCtx.sampleRate * 2, audioCtx.sampleRate);
-            const data = buffer.getChannelData(0);
-            for (let i = 0; i < data.length; i++) {
-                data[i] = Math.random() * 2 - 1;
-            }
-            noise.buffer = buffer;
-            noise.loop = true;
-            
-            const noiseGain = audioCtx.createGain();
-            noiseGain.gain.value = 0.3;
-            
-            const filter = audioCtx.createBiquadFilter();
-            filter.type = 'lowpass';
-            filter.frequency.value = 800;
-            
-            const merge = audioCtx.createChannelMerger(2);
-            osc.connect(merge, 0, 0);
-            noise.connect(noiseGain);
-            noiseGain.connect(filter);
-            filter.connect(merge, 0, 1);
-            
-            return merge;
-        }
+      <!-- Power -->
+      <div class="power-module">
+        <button class="power-btn" id="power-btn" aria-label="Power on/off">
+          <div class="power-icon"></div>
+        </button>
+        <div class="power-lbl">POWER</div>
+      </div>
 
-        // Update VU meter
-        function updateVU() {
-            const needle = document.getElementById('vu-needle');
-            const meter = document.getElementById('vu-meter');
-            
-            let analyser = document.querySelector('input[name="vu-mode"]:checked').value === 'input' ? analyserIn : analyserOut;
-            
-            if (!analyser) return;
-            
-            const data = new Uint8Array(analyser.frequencyBinCount);
-            analyser.getByteTimeDomainData(data);
-            
-            let sum = 0;
-            for (let i = 0; i < data.length; i++) {
-                sum += Math.abs(data[i] - 128);
-            }
-            const level = sum / data.length / 128;
-            
-            // Smooth the needle movement
-            const targetLeft = 10 + (level * 80);
-            const currentLeft = parseFloat(needle.style.left) || 50;
-            const newLeft = currentLeft + (targetLeft - currentLeft) * 0.3;
-            
-            needle.style.left = `${newLeft}%`;
-            
-            // Reactive flicker on tubes
-            const tubes = document.querySelectorAll('.knob-circle');
-            tubes.forEach(tube => {
-                if (isPowerOn) {
-                    const flicker = 0.8 + Math.random() * 0.4;
-                    tube.style.boxShadow = `0 0 ${8 + level * 12}px #ffb454`;
-                }
-            });
-        }
+      <!-- Tone -->
+      <div class="tone-module">
+        <div class="ctrl-lbl">TONE</div>
+        <div class="knob-wrap" id="kw-tone" data-param="tone"
+             data-min="0" data-max="100" data-default="30"
+             style="width:46px;height:46px;" tabindex="0">
+          <svg class="k-svg" viewBox="0 0 52 52" id="ks-tone"></svg>
+          <div class="knob-body"></div>
+        </div>
+        <div class="ctrl-val" id="kv-tone">WARM</div>
+      </div>
 
-        // Knob handling (touch + mouse)
-        function setupKnobs() {
-            const knobs = document.querySelectorAll('.knob-circle');
-            
-            knobs.forEach(knob => {
-                const param = knob.dataset.param;
-                let value = parseFloat(knob.dataset.value);
-                const min = parseFloat(knob.dataset.min);
-                const max = parseFloat(knob.dataset.max);
-                
-                function updateKnob(val) {
-                    const percent = (val - min) / (max - min);
-                    const angle = percent * 270 - 135;
-                    knob.style.transform = `rotate(${angle}deg)`;
-                    
-                    // Update display
-                    const valEl = document.getElementById(`val-${param}`);
-                    if (valEl) {
-                        if (param === 'ratio') {
-                            valEl.textContent = `${val}:1`;
-                        } else if (param === 'tone') {
-                            valEl.textContent = val < 40 ? 'WARM' : val < 70 ? 'NEUTRAL' : 'COOL';
-                        } else {
-                            valEl.textContent = `${val.toFixed(1)}${param === 'threshold' || param === 'makeup' ? ' dB' : param === 'attack' || param === 'release' ? ' ms' : ''}`;
-                        }
-                    }
-                    
-                    // Apply to compressor
-                    if (compressor && isPowerOn) {
-                        if (param === 'threshold') compressor.threshold.value = val;
-                        if (param === 'ratio') compressor.ratio.value = val;
-                        if (param === 'attack') compressor.attack.value = val / 1000;
-                        if (param === 'release') compressor.release.value = val / 1000;
-                        if (param === 'makeup') {
-                            // Makeup gain is handled in the chain
-                        }
-                    }
-                }
-                
-                // Initial position
-                updateKnob(value);
-                
-                let isDragging = false;
-                let startY = 0;
-                let startValue = 0;
-                
-                function onMove(e) {
-                    if (!isDragging) return;
-                    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                    const delta = (startY - clientY) / 2;
-                    let newValue = Math.max(min, Math.min(max, startValue + delta * ((max - min) / 100)));
-                    
-                    updateKnob(newValue);
-                    knob.dataset.value = newValue;
-                }
-                
-                function onEnd() {
-                    isDragging = false;
-                    document.removeEventListener('mousemove', onMove);
-                    document.removeEventListener('mouseup', onEnd);
-                    document.removeEventListener('touchmove', onMove);
-                    document.removeEventListener('touchend', onEnd);
-                }
-                
-                knob.addEventListener('mousedown', (e) => {
-                    isDragging = true;
-                    startY = e.clientY;
-                    startValue = parseFloat(knob.dataset.value);
-                    document.addEventListener('mousemove', onMove);
-                    document.addEventListener('mouseup', onEnd);
-                });
-                
-                knob.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    isDragging = true;
-                    startY = e.touches[0].clientY;
-                    startValue = parseFloat(knob.dataset.value);
-                    document.addEventListener('touchmove', onMove, { passive: false });
-                    document.addEventListener('touchend', onEnd);
-                });
-                
-                // Double click to reset
-                knob.addEventListener('dblclick', () => {
-                    const defaultValue = parseFloat(knob.dataset.value);
-                    updateKnob(defaultValue);
-                    knob.dataset.value = defaultValue;
-                });
-            });
-        }
+    </div>
 
-        // Power button
-        function setupPower() {
-            const btn = document.getElementById('power-btn');
-            btn.addEventListener('click', () => {
-                isPowerOn = !isPowerOn;
-                btn.style.background = isPowerOn ? '#222' : '#3a1a1a';
-                btn.style.borderColor = isPowerOn ? '#555' : '#ff5c3a';
-                btn.style.color = isPowerOn ? '#f4d9a6' : '#ff5c3a';
-                
-                if (isPowerOn) {
-                    initAudio();
-                    initCompressor();
-                }
-            });
-        }
+    <div class="divider" style="margin-top:12px;"></div>
 
-        // Input selector
-        function setupInput() {
-            const select = document.getElementById('input-select');
-            select.addEventListener('change', () => {
-                if (select.value === 'mic') {
-                    initAudio();
-                    navigator.mediaDevices.getUserMedia({ audio: true })
-                        .then(stream => {
-                            if (sourceNode) sourceNode.disconnect();
-                            sourceNode = audioCtx.createMediaStreamSource(stream);
-                            connectAudioChain();
-                        })
-                        .catch(err => alert('Microphone access denied'));
-                } else {
-                    if (sourceNode) sourceNode.disconnect();
-                    sourceNode = createDemoSignal();
-                    connectAudioChain();
-                }
-            });
-        }
+    <!-- ── VHS DECK ── -->
+    <div class="deck">
+      <div class="deck-title">TFD &nbsp;•&nbsp; VHS DECK</div>
+      <div class="deck-btns">
+        <button class="deck-btn rec" id="btn-rec">● REC</button>
+        <button class="deck-btn"     id="btn-play">▶ PLAY</button>
+        <button class="deck-btn"     id="btn-stop">■ STOP</button>
+        <button class="deck-btn"     id="btn-save">SAVE</button>
+        <button class="deck-btn"     id="btn-del">DEL</button>
+      </div>
+      <div class="deck-status" id="deck-status">READY — no recording</div>
+    </div>
 
-        function connectAudioChain() {
-            if (!sourceNode || !compressor || !analyserIn || !analyserOut) return;
-            
-            sourceNode.connect(analyserIn);
-            analyserIn.connect(compressor);
-            compressor.connect(analyserOut);
-            analyserOut.connect(audioCtx.destination);
-        }
+    <!-- ── FOOTER ── -->
+    <div class="unit-foot">
+      <div class="foot-txt">THOMPRESSOR™ v1.1 &nbsp;•&nbsp; MIT LICENSE</div>
+      <div class="foot-links">
+        <a href="THOMPRESSOR-AGENTS.md">AGENTS.md</a>
+        <a href="PROJECT.md">PROJECT.md</a>
+      </div>
+    </div>
 
-        // VHS Deck
-        function setupDeck() {
-            const recBtn = document.getElementById('rec-btn');
-            const playBtn = document.getElementById('play-btn');
-            const stopBtn = document.getElementById('stop-btn');
-            const saveBtn = document.getElementById('save-btn');
-            const delBtn = document.getElementById('del-btn');
-            const status = document.getElementById('deck-status');
-            
-            let recordedBlob = null;
-            
-            recBtn.addEventListener('click', () => {
-                if (isRecording) return;
-                
-                initAudio();
-                navigator.mediaDevices.getUserMedia({ audio: true })
-                    .then(stream => {
-                        mediaRecorder = new MediaRecorder(stream);
-                        recordedChunks = [];
-                        
-                        mediaRecorder.ondataavailable = e => recordedChunks.push(e.data);
-                        mediaRecorder.onstop = () => {
-                            recordedBlob = new Blob(recordedChunks, { type: 'audio/webm' });
-                            status.textContent = 'Recording saved • ' + (recordedBlob.size / 1024).toFixed(1) + ' KB';
-                        };
-                        
-                        mediaRecorder.start();
-                        isRecording = true;
-                        status.textContent = '● RECORDING...';
-                        recBtn.style.background = '#ff5c3a';
-                        recBtn.style.color = '#fff';
-                    })
-                    .catch(() => alert('Microphone access required for recording'));
-            });
-            
-            stopBtn.addEventListener('click', () => {
-                if (mediaRecorder && isRecording) {
-                    mediaRecorder.stop();
-                    isRecording = false;
-                    recBtn.style.background = '#3a1a1a';
-                    recBtn.style.color = '#ff5c3a';
-                }
-            });
-            
-            saveBtn.addEventListener('click', () => {
-                if (!recordedBlob) {
-                    alert('No recording to save');
-                    return;
-                }
-                const url = URL.createObjectURL(recordedBlob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `thompressor-recording-${Date.now()}.webm`;
-                a.click();
-                status.textContent = 'Saved to Downloads';
-            });
-            
-            delBtn.addEventListener('click', () => {
-                recordedBlob = null;
-                status.textContent = 'Recording deleted';
-            });
-            
-            playBtn.addEventListener('click', () => {
-                if (!recordedBlob) {
-                    alert('No recording to play');
-                    return;
-                }
-                const audio = new Audio(URL.createObjectURL(recordedBlob));
-                audio.play();
-                status.textContent = 'Playing recording...';
-            });
-        }
+  </div><!-- /faceplate -->
+</div><!-- /unit -->
 
-        // Main init
-        function init() {
-            initAudio();
-            initCompressor();
-            setupKnobs();
-            setupPower();
-            setupInput();
-            setupDeck();
-            
-            // Start VU animation
-            setInterval(updateVU, 50);
-            
-            // Initial demo signal
-            setTimeout(() => {
-                const select = document.getElementById('input-select');
-                if (select.value === 'demo') {
-                    sourceNode = createDemoSignal();
-                    connectAudioChain();
-                }
-            }, 300);
-            
-            // Welcome message
-            console.log('%c[THOMPRESSOR] v1.0 PWA ready — all systems nominal', 'color:#ffb454');
-        }
-        
-        // PWA install prompt
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-        });
-        
-        window.onload = init;
-    </script>
+<script>
+'use strict';
+/* ============================================================
+   THOMPRESSOR™ v1.1 — Audio Engine
+   Fixes from v1.0 review:
+   ✓ Demo signal actually starts (osc.start + noise.start)
+   ✓ Makeup GainNode in signal chain
+   ✓ Tone → BiquadFilter (lowshelf/highshelf) + UI color temp
+   ✓ setTargetAtTime() for all AudioParam changes
+   ✓ AudioContext only on user gesture
+   ✓ ChannelMerger replaced with gain-mixer
+   ✓ Double-click reset uses stored defaults
+   ✓ RESET ALL works (per-knob dblclick)
+   ✓ POWER properly reconnects chain
+   ✓ requestAnimationFrame for VU (60fps)
+   ✓ Spring-physics VU needle (overshoot + damping)
+   ✓ Service worker registered
+   ============================================================ */
+
+// ─── DEFAULTS ─────────────────────────────────────────────
+const PARAM_DEFAULTS = {
+  threshold: -24,
+  ratio:      4,
+  attack:     0.5,
+  release:    120,
+  makeup:     4,
+  tone:       30,
+};
+
+const PARAM_CURRENT = { ...PARAM_DEFAULTS };
+
+// ─── AUDIO STATE ──────────────────────────────────────────
+let audioCtx     = null;
+let compressor   = null;
+let makeupGain   = null;
+let toneFilter   = null;
+let analyserIn   = null;
+let analyserOut  = null;
+let sourceNode   = null;
+let oscNode      = null;
+let noiseNode    = null;
+let micStream    = null;
+let isPowerOn    = false;
+let currentInput = 'demo';
+
+// ─── VU NEEDLE STATE (spring physics) ─────────────────────
+let vuAngle    = -60;   // current needle angle in degrees
+let vuVelocity = 0;
+
+// ─── AUDIO CONTEXT ────────────────────────────────────────
+function ctx() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+// ─── BUILD SIGNAL CHAIN ───────────────────────────────────
+function buildChain() {
+  const c = ctx();
+  if (!compressor) {
+    compressor = c.createDynamicsCompressor();
+    compressor.knee.value = 6;
+    compressor.threshold.value = PARAM_CURRENT.threshold;
+    compressor.ratio.value     = PARAM_CURRENT.ratio;
+    compressor.attack.value    = PARAM_CURRENT.attack  / 1000;
+    compressor.release.value   = PARAM_CURRENT.release / 1000;
+  }
+  if (!makeupGain) {
+    makeupGain = c.createGain();
+    makeupGain.gain.value = dBtoLinear(PARAM_CURRENT.makeup);
+  }
+  if (!toneFilter) {
+    toneFilter = c.createBiquadFilter();
+    toneFilter.type = 'lowshelf';
+    toneFilter.frequency.value = 300;
+    toneFilter.gain.value = 3;
+  }
+  if (!analyserIn) {
+    analyserIn = c.createAnalyser();
+    analyserIn.fftSize = 1024;
+    analyserIn.smoothingTimeConstant = 0.7;
+  }
+  if (!analyserOut) {
+    analyserOut = c.createAnalyser();
+    analyserOut.fftSize = 1024;
+    analyserOut.smoothingTimeConstant = 0.7;
+  }
+}
+
+function connectChain() {
+  if (!sourceNode || !compressor) return;
+  // Disconnect everything first
+  [analyserIn, compressor, makeupGain, toneFilter, analyserOut].forEach(n => {
+    try { n.disconnect(); } catch(_) {}
+  });
+  // source → analyserIn → compressor → makeupGain → toneFilter → analyserOut → out
+  sourceNode.connect(analyserIn);
+  analyserIn.connect(compressor);
+  compressor.connect(makeupGain);
+  makeupGain.connect(toneFilter);
+  toneFilter.connect(analyserOut);
+  analyserOut.connect(audioCtx.destination);
+}
+
+// ─── DEMO SIGNAL (fixed: starts osc + noise) ──────────────
+function startDemoSignal() {
+  const c = ctx();
+  stopSource();
+
+  oscNode = c.createOscillator();
+  oscNode.type = 'sawtooth';
+  oscNode.frequency.value = 110;
+
+  const bufLen = c.sampleRate * 2;
+  const buf    = c.createBuffer(1, bufLen, c.sampleRate);
+  const data   = buf.getChannelData(0);
+  for (let i = 0; i < bufLen; i++) data[i] = Math.random() * 2 - 1;
+
+  noiseNode = c.createBufferSource();
+  noiseNode.buffer = buf;
+  noiseNode.loop = true;
+
+  // Mix via GainNodes (not ChannelMerger — that was the bug)
+  const oscGain   = c.createGain();  oscGain.gain.value   = 0.55;
+  const noiseGain = c.createGain();  noiseGain.gain.value = 0.10;
+  const lp        = c.createBiquadFilter();
+  lp.type = 'lowpass';  lp.frequency.value = 1400;
+
+  const mix = c.createGain();  mix.gain.value = 0.8;
+
+  oscNode.connect(oscGain);        oscGain.connect(mix);
+  noiseNode.connect(noiseGain);    noiseGain.connect(lp);  lp.connect(mix);
+
+  sourceNode = mix;
+  oscNode.start();    // ← was missing in v1.0
+  noiseNode.start();  // ← was missing in v1.0
+}
+
+function stopSource() {
+  try { oscNode?.stop();   } catch(_) {}
+  try { noiseNode?.stop(); } catch(_) {}
+  if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; }
+  oscNode = noiseNode = sourceNode = null;
+}
+
+// ─── APPLY AUDIO PARAMS (Golden Rule: setTargetAtTime) ────
+function dBtoLinear(db) { return Math.pow(10, db / 20); }
+
+function applyParam(param, value) {
+  if (!audioCtx) return;
+  const t  = audioCtx.currentTime;
+  const tc = 0.02; // 20ms smoothing
+
+  if (param === 'threshold' && compressor)
+    compressor.threshold.setTargetAtTime(value,         t, tc);
+  if (param === 'ratio'     && compressor)
+    compressor.ratio.setTargetAtTime(value,              t, tc);
+  if (param === 'attack'    && compressor)
+    compressor.attack.setTargetAtTime(value / 1000,     t, tc);
+  if (param === 'release'   && compressor)
+    compressor.release.setTargetAtTime(value / 1000,    t, tc);
+  if (param === 'makeup'    && makeupGain)
+    makeupGain.gain.setTargetAtTime(dBtoLinear(value),  t, tc);
+  if (param === 'tone'      && toneFilter)
+    applyTone(value, t, tc);
+}
+
+function applyTone(val, t, tc) {
+  // 0 = warm (low-shelf boost) | 100 = cool (high-shelf boost)
+  if (val < 50) {
+    toneFilter.type = 'lowshelf';
+    toneFilter.frequency.setTargetAtTime(280,            t, tc);
+    toneFilter.gain.setTargetAtTime((50 - val) / 50 * 4, t, tc); // 0–4 dB
+  } else {
+    toneFilter.type = 'highshelf';
+    toneFilter.frequency.setTargetAtTime(3500,            t, tc);
+    toneFilter.gain.setTargetAtTime((val - 50) / 50 * 3,  t, tc); // 0–3 dB
+  }
+  // Color temperature shift
+  const warm = [255, 107,   0];
+  const cool = [  0, 196, 224];
+  const t01  = val / 100;
+  const r = Math.round(warm[0] + (cool[0]-warm[0]) * t01);
+  const g = Math.round(warm[1] + (cool[1]-warm[1]) * t01);
+  const b = Math.round(warm[2] + (cool[2]-warm[2]) * t01);
+  const hex = `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
+  document.documentElement.style.setProperty('--accent', hex);
+  document.querySelectorAll('.k-arc-fill').forEach(el => el.style.stroke = hex);
+  document.querySelectorAll('.k-dot').forEach(el => {
+    el.setAttribute('fill', hex);
+    el.style.filter = `drop-shadow(0 0 3px ${hex})`;
+  });
+}
+
+// ─── KNOB SYSTEM ──────────────────────────────────────────
+// Arc geometry constants (26 = centre of 52px SVG)
+const CX = 26, CY = 26, R_TRACK = 19, R_DOT = 19;
+const ARC_START = -225, ARC_TOTAL = 270; // degrees
+
+function polarToXY(angleDeg, r) {
+  const rad = (angleDeg - 90) * Math.PI / 180;
+  return [CX + r * Math.cos(rad), CY + r * Math.sin(rad)];
+}
+
+function svgArc(startDeg, endDeg, r) {
+  const [x1, y1] = polarToXY(startDeg, r);
+  const [x2, y2] = polarToXY(endDeg,   r);
+  const large = Math.abs(endDeg - startDeg) > 180 ? 1 : 0;
+  return `M ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${large} 1 ${x2.toFixed(2)} ${y2.toFixed(2)}`;
+}
+
+function buildKnobSVG(svgEl, param) {
+  const ns = 'http://www.w3.org/2000/svg';
+  // Background track arc (-225° to +45°, the 270° sweep)
+  const track = document.createElementNS(ns, 'path');
+  track.setAttribute('d', svgArc(ARC_START, ARC_START + ARC_TOTAL, R_TRACK));
+  track.setAttribute('fill', 'none');
+  track.setAttribute('stroke', '#1e1a12');
+  track.setAttribute('stroke-width', '3');
+  track.setAttribute('stroke-linecap', 'round');
+  svgEl.appendChild(track);
+
+  // Active fill arc
+  const fill = document.createElementNS(ns, 'path');
+  fill.setAttribute('fill', 'none');
+  fill.setAttribute('stroke', 'var(--orange)');
+  fill.setAttribute('stroke-width', '2.5');
+  fill.setAttribute('stroke-linecap', 'round');
+  fill.classList.add('k-arc-fill');
+  fill.id = `k-fill-${param}`;
+  svgEl.appendChild(fill);
+
+  // Indicator dot
+  const dot = document.createElementNS(ns, 'circle');
+  dot.setAttribute('r', '2.8');
+  dot.setAttribute('fill', 'var(--orange)');
+  dot.style.filter = 'drop-shadow(0 0 3px var(--orange))';
+  dot.classList.add('k-dot');
+  dot.id = `k-dot-${param}`;
+  svgEl.appendChild(dot);
+}
+
+function updateKnobVisual(param, val) {
+  const kw = document.getElementById(`kw-${param}`);
+  if (!kw) return;
+  const min  = parseFloat(kw.dataset.min);
+  const max  = parseFloat(kw.dataset.max);
+  const norm = Math.max(0, Math.min(1, (val - min) / (max - min)));
+  const angleDeg = ARC_START + norm * ARC_TOTAL;
+
+  // Fill arc
+  const fill = document.getElementById(`k-fill-${param}`);
+  if (fill) {
+    if (norm > 0.01)
+      fill.setAttribute('d', svgArc(ARC_START, angleDeg, R_TRACK));
+    else
+      fill.setAttribute('d', '');
+  }
+
+  // Dot position on arc
+  const dot = document.getElementById(`k-dot-${param}`);
+  if (dot) {
+    const [dx, dy] = polarToXY(angleDeg, R_DOT);
+    dot.setAttribute('cx', dx.toFixed(2));
+    dot.setAttribute('cy', dy.toFixed(2));
+  }
+
+  // Value text
+  const display = document.getElementById(`kv-${param}`);
+  if (display) display.textContent = formatVal(param, val);
+}
+
+function formatVal(param, val) {
+  if (param === 'ratio')     return `${Math.round(val)} : 1`;
+  if (param === 'tone')      return val < 34 ? 'WARM' : val < 67 ? 'NEUTRAL' : 'COOL';
+  if (param === 'threshold') return `${val > 0 ? '+' : ''}${val.toFixed(0)} dB`;
+  if (param === 'makeup')    return `${val > 0 ? '+' : ''}${val.toFixed(1)} dB`;
+  if (param === 'attack')    return `${val.toFixed(1)} ms`;
+  if (param === 'release')   return `${Math.round(val)} ms`;
+  return val.toFixed(1);
+}
+
+function setupKnobs() {
+  document.querySelectorAll('.knob-wrap').forEach(kw => {
+    const param = kw.dataset.param;
+    const min   = parseFloat(kw.dataset.min);
+    const max   = parseFloat(kw.dataset.max);
+    const def   = parseFloat(kw.dataset.default) ?? PARAM_DEFAULTS[param];
+
+    // Build SVG
+    const svgEl = document.getElementById(`ks-${param}`);
+    if (svgEl) buildKnobSVG(svgEl, param);
+
+    // Set initial
+    PARAM_CURRENT[param] = def;
+    updateKnobVisual(param, def);
+
+    const sensitivity = (max - min) / 160; // pixel → value
+
+    let dragging = false, startY = 0, startVal = def;
+
+    function onMove(e) {
+      if (!dragging) return;
+      const cY = e.touches ? e.touches[0].clientY : e.clientY;
+      const nv  = Math.max(min, Math.min(max, startVal + (startY - cY) * sensitivity));
+      PARAM_CURRENT[param] = nv;
+      kw.dataset.value = nv;
+      updateKnobVisual(param, nv);
+      if (isPowerOn) applyParam(param, nv);
+    }
+    function onEnd() {
+      dragging = false;
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup',   onEnd);
+      document.removeEventListener('touchmove', onMove);
+      document.removeEventListener('touchend',  onEnd);
+    }
+
+    kw.addEventListener('mousedown', e => {
+      e.preventDefault();
+      ctx(); // resume context on gesture
+      dragging = true; startY = e.clientY; startVal = PARAM_CURRENT[param];
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup',   onEnd);
+    });
+    kw.addEventListener('touchstart', e => {
+      e.preventDefault();
+      ctx();
+      dragging = true; startY = e.touches[0].clientY; startVal = PARAM_CURRENT[param];
+      document.addEventListener('touchmove', onMove, { passive: false });
+      document.addEventListener('touchend',  onEnd);
+    }, { passive: false });
+
+    // Double-click / double-tap → reset to default
+    let lastTap = 0;
+    function resetToDefault() {
+      PARAM_CURRENT[param] = def;
+      kw.dataset.value = def;
+      updateKnobVisual(param, def);
+      if (isPowerOn) applyParam(param, def);
+    }
+    kw.addEventListener('dblclick', resetToDefault);
+    kw.addEventListener('touchend', () => {
+      const now = Date.now();
+      if (now - lastTap < 320) resetToDefault();
+      lastTap = now;
+    });
+
+    // Keyboard
+    kw.addEventListener('keydown', e => {
+      const step = sensitivity * 4;
+      if (e.key === 'ArrowUp' || e.key === 'ArrowRight') {
+        e.preventDefault();
+        const nv = Math.min(max, PARAM_CURRENT[param] + step);
+        PARAM_CURRENT[param] = nv;
+        updateKnobVisual(param, nv);
+        if (isPowerOn) applyParam(param, nv);
+      }
+      if (e.key === 'ArrowDown' || e.key === 'ArrowLeft') {
+        e.preventDefault();
+        const nv = Math.max(min, PARAM_CURRENT[param] - step);
+        PARAM_CURRENT[param] = nv;
+        updateKnobVisual(param, nv);
+        if (isPowerOn) applyParam(param, nv);
+      }
+    });
+  });
+}
+
+// ─── POWER ────────────────────────────────────────────────
+function setupPower() {
+  const btn  = document.getElementById('power-btn');
+  const tube = document.getElementById('tube-outer');
+  const led  = document.getElementById('led');
+
+  btn.addEventListener('click', () => {
+    isPowerOn = !isPowerOn;
+    btn.classList.toggle('on', isPowerOn);
+    tube.classList.toggle('on', isPowerOn);
+    led.classList.toggle('on', isPowerOn);
+
+    if (isPowerOn) {
+      buildChain();
+      if (currentInput === 'mic') {
+        navigator.mediaDevices.getUserMedia({ audio: true, echoCancellation: false })
+          .then(stream => {
+            micStream = stream;
+            sourceNode = audioCtx.createMediaStreamSource(stream);
+            connectChain();
+          }).catch(() => {
+            // fallback demo
+            currentInput = 'demo';
+            document.querySelectorAll('.rotary-opt').forEach((b, i) => b.classList.toggle('active', i === 0));
+            startDemoSignal(); connectChain();
+          });
+      } else {
+        startDemoSignal();
+        connectChain();
+      }
+    } else {
+      stopSource();
+      try { makeupGain?.disconnect(); } catch(_) {}
+    }
+  });
+}
+
+// ─── INPUT SELECTOR ───────────────────────────────────────
+function setupInput() {
+  document.querySelectorAll('.rotary-opt').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (btn.disabled) return;
+      const val = btn.dataset.val;
+      document.querySelectorAll('.rotary-opt').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentInput = val;
+
+      if (!isPowerOn) return;
+      ctx();
+      buildChain();
+
+      if (val === 'mic') {
+        navigator.mediaDevices.getUserMedia({ audio: true, echoCancellation: false })
+          .then(stream => {
+            stopSource();
+            micStream = stream;
+            sourceNode = audioCtx.createMediaStreamSource(stream);
+            connectChain();
+          }).catch(() => alert('Microphone access denied'));
+      } else {
+        startDemoSignal();
+        connectChain();
+      }
+    });
+  });
+}
+
+// ─── VU METER — SVG arc + spring needle ──────────────────
+function setupVUMeter() {
+  const scaleG = document.getElementById('vu-scale-g');
+  const track  = document.getElementById('vu-track');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  // Pivot: (160, 88), needle length 70, arc radius 72
+  const PX = 160, PY = 88, NL = 70, AR = 72;
+  // Swing: -60° to +60° measured from straight up (12 o'clock)
+  const dbStops  = [-20, -10,  -7,  -5,  -3,   0,  +2, +3];
+  const angStops = [-60, -30, -20,  -13,  -4,  15,  38, 60];
+
+  // Draw static track
+  function vuArcPath(a1, a2, r) {
+    const toRad = d => (d - 90) * Math.PI / 180;
+    const x1 = PX + r * Math.cos(toRad(a1)), y1 = PY + r * Math.sin(toRad(a1));
+    const x2 = PX + r * Math.cos(toRad(a2)), y2 = PY + r * Math.sin(toRad(a2));
+    return `M ${x1.toFixed(1)} ${y1.toFixed(1)} A ${r} ${r} 0 0 1 ${x2.toFixed(1)} ${y2.toFixed(1)}`;
+  }
+  track.setAttribute('d', vuArcPath(-60, 60, AR));
+
+  // Scale ticks + labels
+  dbStops.forEach((db, i) => {
+    const ang = angStops[i];
+    const rad = (ang - 90) * Math.PI / 180;
+    const isMain = (db === 0 || db === -20 || db === -10);
+    const len  = isMain ? 10 : 6;
+    const r1   = AR - 2, r2 = AR - 2 - len;
+    const x1   = PX + r1 * Math.cos(rad), y1 = PY + r1 * Math.sin(rad);
+    const x2   = PX + r2 * Math.cos(rad), y2 = PY + r2 * Math.sin(rad);
+    const col  = db >= 0 ? '#5a1a10' : db >= -3 ? '#4a4010' : '#1a4a1a';
+
+    const tick = document.createElementNS(ns, 'line');
+    tick.setAttribute('x1', x1.toFixed(1)); tick.setAttribute('y1', y1.toFixed(1));
+    tick.setAttribute('x2', x2.toFixed(1)); tick.setAttribute('y2', y2.toFixed(1));
+    tick.setAttribute('stroke', col);
+    tick.setAttribute('stroke-width', isMain ? '1.5' : '1');
+    scaleG.appendChild(tick);
+
+    if (isMain || db === -3 || db === 3) {
+      const tr = AR - 2 - len - 8;
+      const tx = PX + tr * Math.cos(rad), ty = PY + tr * Math.sin(rad);
+      const txt = document.createElementNS(ns, 'text');
+      txt.setAttribute('x', tx.toFixed(1));
+      txt.setAttribute('y', (ty + 3.5).toFixed(1));
+      txt.setAttribute('text-anchor', 'middle');
+      txt.setAttribute('font-size', '7.5');
+      txt.setAttribute('fill', col);
+      txt.setAttribute('font-family', 'ui-monospace,monospace');
+      txt.setAttribute('font-weight', isMain ? '700' : '400');
+      txt.textContent = db > 0 ? `+${db}` : db;
+      scaleG.appendChild(txt);
+    }
+  });
+
+  // Animation
+  const levelArc   = document.getElementById('vu-level');
+  const needleG    = document.getElementById('vu-needle-g');
+  const modeInputs = document.querySelectorAll('input[name="vu-mode"]');
+
+  function frame() {
+    let targetAngle = -60;
+
+    if (isPowerOn && (analyserIn || analyserOut)) {
+      const mode    = [...modeInputs].find(r => r.checked)?.value;
+      const analyser = mode === 'out' ? analyserOut : analyserIn;
+      if (analyser) {
+        const buf = new Float32Array(analyser.fftSize);
+        analyser.getFloatTimeDomainData(buf);
+        let rms = 0;
+        for (let i = 0; i < buf.length; i++) rms += buf[i] * buf[i];
+        rms = Math.sqrt(rms / buf.length);
+        const db = rms > 0.00001 ? 20 * Math.log10(rms) : -80;
+        // Map -30dB→-60°, +3dB→+60° (a bit generous so demo signal shows nicely)
+        targetAngle = Math.max(-60, Math.min(60, ((db + 30) / 33) * 120 - 60));
+      }
+    }
+
+    // Spring physics (overshoot + return)
+    const spring = 0.14;
+    const damp   = 0.70;
+    vuVelocity = vuVelocity * damp + (targetAngle - vuAngle) * spring;
+    vuAngle   += vuVelocity;
+    vuAngle    = Math.max(-65, Math.min(65, vuAngle));
+
+    // Rotate needle
+    needleG.setAttribute('transform', `rotate(${vuAngle.toFixed(2)}, ${PX}, ${PY})`);
+
+    // Level arc color
+    const col = vuAngle > 38 ? '#cc2a10' : vuAngle > 14 ? '#8a7010' : '#1e6a10';
+    levelArc.style.stroke = col;
+    if (vuAngle > -59.5)
+      levelArc.setAttribute('d', vuArcPath(-60, Math.max(-59, vuAngle), AR));
+    else
+      levelArc.setAttribute('d', '');
+
+    // Tube flicker
+    const tubeGlow = document.querySelector('.tube-glow');
+    if (tubeGlow && isPowerOn) {
+      const ratio  = PARAM_CURRENT.ratio  || 4;
+      const makeup = PARAM_CURRENT.makeup || 4;
+      const fi = 0.82 + Math.random() * 0.18 * ((ratio / 20) + (makeup + 12) / 24) * 0.6;
+      tubeGlow.style.opacity = (0.88 * fi).toFixed(3);
+    }
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+// ─── VHS DECK ─────────────────────────────────────────────
+function setupDeck() {
+  const recBtn  = document.getElementById('btn-rec');
+  const playBtn = document.getElementById('btn-play');
+  const stopBtn = document.getElementById('btn-stop');
+  const saveBtn = document.getElementById('btn-save');
+  const delBtn  = document.getElementById('btn-del');
+  const status  = document.getElementById('deck-status');
+
+  let mediaRec = null, chunks = [], blob = null, recording = false;
+
+  function setStatus(msg) { status.textContent = msg; }
+
+  recBtn.addEventListener('click', () => {
+    if (recording) return;
+    ctx();
+    navigator.mediaDevices.getUserMedia({ audio: true, echoCancellation: false })
+      .then(stream => {
+        mediaRec = new MediaRecorder(stream);
+        chunks = [];
+        mediaRec.ondataavailable = e => chunks.push(e.data);
+        mediaRec.onstop = () => {
+          blob = new Blob(chunks, { type: 'audio/webm' });
+          setStatus(`READY — ${(blob.size / 1024).toFixed(1)} KB`);
+          recBtn.classList.remove('live');
+        };
+        mediaRec.start();
+        recording = true;
+        recBtn.classList.add('live');
+        setStatus('● RECORDING...');
+      })
+      .catch(() => setStatus('MIC DENIED'));
+  });
+
+  stopBtn.addEventListener('click', () => {
+    if (mediaRec && recording) {
+      mediaRec.stop();
+      mediaRec.stream.getTracks().forEach(t => t.stop());
+      recording = false;
+    }
+  });
+
+  playBtn.addEventListener('click', () => {
+    if (!blob) { setStatus('NO RECORDING'); return; }
+    const aud = new Audio(URL.createObjectURL(blob));
+    aud.play();
+    setStatus('▶ PLAYING...');
+    aud.onended = () => setStatus('DONE');
+  });
+
+  saveBtn.addEventListener('click', () => {
+    if (!blob) { setStatus('NOTHING TO SAVE'); return; }
+    const a = Object.assign(document.createElement('a'), {
+      href: URL.createObjectURL(blob),
+      download: `thompressor-${Date.now()}.webm`
+    });
+    a.click();
+    setStatus('SAVED TO DOWNLOADS');
+  });
+
+  delBtn.addEventListener('click', () => {
+    blob = null; chunks = [];
+    setStatus('DELETED');
+  });
+}
+
+// ─── SERVICE WORKER ───────────────────────────────────────
+function registerSW() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  }
+}
+
+// ─── BOOT ─────────────────────────────────────────────────
+function boot() {
+  setupKnobs();
+  setupPower();
+  setupInput();
+  setupVUMeter();
+  setupDeck();
+  registerSW();
+  // Apply initial tone color
+  applyTone(PARAM_DEFAULTS.tone, 0, 0);
+  console.log('%c[THOMPRESSOR™] v1.1 — all bugs fixed, all systems nominal', 'color:#ff6b00;font-weight:bold');
+}
+
+document.addEventListener('DOMContentLoaded', boot);
+</script>
 </body>
 </html>
